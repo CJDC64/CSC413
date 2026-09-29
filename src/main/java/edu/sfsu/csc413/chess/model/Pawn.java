@@ -23,7 +23,7 @@ public class Pawn extends Piece {
     /**
      * What a pawn may become on reaching the far rank.
      */
-    private static final PieceType[] PROMOTION_CHOICES = { PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT };
+    private static final PieceType[] PROMOTION_CHOICES = {PieceType.QUEEN, PieceType.ROOK, PieceType.BISHOP, PieceType.KNIGHT};
 
     public Pawn(Color color) {
         super(color, PieceType.PAWN);
@@ -31,8 +31,70 @@ public class Pawn extends Piece {
 
     @Override
     public List<Move> pseudoLegalMoves(Board board, Position from) {
-        throw new UnsupportedOperationException("M2: implement Pawn.pseudoLegalMoves");
+        List<Move> moves = new ArrayList<>();
+
+        int direction = color().pawnDirection();
+
+        // One square forward
+        Position oneForward = from.offsetOrNull(0, direction);
+
+        if (oneForward != null && board.pieceAt(oneForward) == null) {
+
+            // Promotion
+            if (oneForward.rank() == color().promotionRank()) {
+                for (PieceType choice : PROMOTION_CHOICES) {
+                    moves.add(Move.promotion(from, oneForward, this, null, choice));
+                }
+            } else {
+                moves.add(Move.quiet(from, oneForward, this));
+            }
+
+            // Two squares forward from starting rank
+            if (from.rank() == color().pawnStartRank()) {
+                Position twoForward = from.offsetOrNull(0, direction * 2);
+
+                if (twoForward != null && board.pieceAt(twoForward) == null) {
+                    moves.add(Move.quiet(from, twoForward, this));
+                }
+            }
+        }
+
+        // Diagonal captures
+        Position leftCapture = from.offsetOrNull(-1, direction);
+        Position rightCapture = from.offsetOrNull(1, direction);
+
+        if (leftCapture != null) {
+            Piece target = board.pieceAt(leftCapture);
+
+            if (target != null && target.color() != color()) {
+                if (leftCapture.rank() == color().promotionRank()) {
+                    for (PieceType choice : PROMOTION_CHOICES) {
+                        moves.add(Move.promotion(from, leftCapture, this, target, choice));
+                    }
+                } else {
+                    moves.add(Move.capture(from, leftCapture, this, target));
+                }
+            }
+        }
+
+        if (rightCapture != null) {
+            Piece target = board.pieceAt(rightCapture);
+
+            if (target != null && target.color() != color()) {
+                if (rightCapture.rank() == color().promotionRank()) {
+                    for (PieceType choice : PROMOTION_CHOICES) {
+                        moves.add(Move.promotion(from, rightCapture, this, target, choice));
+                    }
+                } else {
+                    moves.add(Move.capture(from, rightCapture, this, target));
+                }
+            }
+        }
+
+        return moves;
+
     }
+
 
     /**
      * A pawn attacks the two squares diagonally ahead of it, whether or not
@@ -47,6 +109,11 @@ public class Pawn extends Piece {
      */
     @Override
     public boolean attacks(Board board, Position from, Position target) {
-        throw new UnsupportedOperationException("M2: implement Pawn.attacks");
+        int direction = color().pawnDirection();
+
+        Position leftAttack = from.offsetOrNull(-1, direction);
+        Position rightAttack = from.offsetOrNull(1, direction);
+
+        return target.equals(leftAttack) || target.equals(rightAttack);
     }
 }
