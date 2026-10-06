@@ -10,6 +10,16 @@ public class Board {
         squares = new Piece[8][8];
     }
 
+    public void apply(Move move) {// lift the piece off `from`, set it down on `to`
+        place(move.from(), null);
+        place(move.to(), move.moved());
+    }
+
+    public void undo(Move move) {// put `moved` back on `from`; put `captured` (or null) back on `to`
+        place(move.from(), move.moved());
+        place(move.to(), move.captured());
+    }
+
     public Piece pieceAt(Position position) {
         return squares[position.file()][position.rank()];
     }
