@@ -2,6 +2,7 @@ package edu.sfsu.csc413.chess.model;
 
 import java.util.ArrayList;
 import java.util.List;
+import edu.sfsu.csc413.chess.model.Position;
 
 public class Board {
     private final Piece[][] squares;
@@ -81,4 +82,18 @@ public class Board {
 
         return result;
     }
+
+    //Returns the position of the given color's king
+    public Position kingPosition(Color color) {
+        for (Position position : positionsOf(color)) {
+            Piece piece = pieceAt(position);
+
+            if (piece.type() == PieceType.KING) {
+                return position;
+            }
+        }
+
+        return null;
+    }
+
 }

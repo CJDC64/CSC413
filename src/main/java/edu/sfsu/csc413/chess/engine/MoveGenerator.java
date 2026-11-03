@@ -4,6 +4,7 @@ import edu.sfsu.csc413.chess.model.Board;
 import edu.sfsu.csc413.chess.model.Color;
 import edu.sfsu.csc413.chess.model.Move;
 import edu.sfsu.csc413.chess.model.Position;
+import edu.sfsu.csc413.chess.model.Piece;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -41,7 +42,21 @@ public final class MoveGenerator {
      * when it tightens.
      */
     public static List<Move> legalMoves(Board board, Color color) {
-        return pseudoLegalMoves(board, color);
+        List<Move> legal = new ArrayList<>();
+
+        for (Move move : pseudoLegalMoves(board, color)) {
+            board.apply(move);
+
+            boolean inCheck = isInCheck(board, color);
+
+            board.undo(move);
+
+            if (!inCheck) {
+                legal.add(move);
+            }
+        }
+
+        return legal;
     }
 
     /**
@@ -64,4 +79,29 @@ public final class MoveGenerator {
 
         return moves;
     }
+
+    // Returns if the given color's king is in check. Returns false if that color has no king.
+    public static boolean isInCheck(Board board, Color color) {
+        Position kingPosition = board.kingPosition(color);
+
+        if (kingPosition == null) {
+            return false;
+        }
+
+        return isAttacked(board, kingPosition, color.opposite());
+    }
+
+    // Returns if the target square is attacked by any piece of the attacking color
+    public static boolean isAttacked(Board board, Position target, Color attacker) {
+        for (Position from : board.positionsOf(attacker)) {
+            Piece piece = board.pieceAt(from);
+
+            if (piece.attacks(board, from, target)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
 }
