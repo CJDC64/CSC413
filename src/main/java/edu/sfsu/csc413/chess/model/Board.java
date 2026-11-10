@@ -12,8 +12,26 @@ public class Board {
     }
 
     public void apply(Move move) {// lift the piece off `from`, set it down on `to`
+        Piece destinationPiece = move.moved();
+
+        if (move.isPromotion()) {
+            destinationPiece = createPromoted(
+                    move.promotesTo(), move.moved().color());
+        }
+
         place(move.from(), null);
-        place(move.to(), move.moved());
+        place(move.to(), destinationPiece);
+    }
+
+    private static Piece createPromoted(PieceType type, Color color) {
+        return switch (type) {
+            case QUEEN -> new Queen(color);
+            case ROOK -> new Rook(color);
+            case BISHOP -> new Bishop(color);
+            case KNIGHT -> new Knight(color);
+            default -> throw new IllegalArgumentException(
+                    "Invalid promotion type: " + type);
+        };
     }
 
     public void undo(Move move) {// put `moved` back on `from`; put `captured` (or null) back on `to`

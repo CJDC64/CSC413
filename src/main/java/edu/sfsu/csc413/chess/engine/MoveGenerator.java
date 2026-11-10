@@ -104,4 +104,21 @@ public final class MoveGenerator {
         return false;
     }
 
+    // Determines the game status (checkmate, stalemate, or ongoing)
+    public static GameStatus status(Board board, Color sideToMove) {
+        boolean inCheck = isInCheck(board, sideToMove);
+        boolean hasLegalMove = !legalMoves(board, sideToMove).isEmpty();
+
+        if (hasLegalMove) {
+            if (inCheck) {
+                return GameStatus.CHECK;
+            }
+            return GameStatus.IN_PROGRESS;
+        }
+
+        if (inCheck) {
+            return GameStatus.CHECKMATE;
+        }
+        return GameStatus.STALEMATE;
+    }
 }

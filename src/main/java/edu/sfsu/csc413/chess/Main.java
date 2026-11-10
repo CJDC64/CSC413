@@ -1,9 +1,9 @@
 package edu.sfsu.csc413.chess;
 
-import edu.sfsu.csc413.chess.model.Board;
-import edu.sfsu.csc413.chess.view.PieceGlyphs;
-import edu.sfsu.csc413.chess.view.TextBoardRenderer;
-import edu.sfsu.csc413.chess.factory.BoardFactory;
+import edu.sfsu.csc413.chess.view.BoardView;
+import edu.sfsu.csc413.chess.view.ConsoleView;
+import edu.sfsu.csc413.chess.view.EmojiView;
+import edu.sfsu.csc413.chess.view.GameController;
 import edu.sfsu.csc413.chess.engine.Game;
 
 import java.util.List;
@@ -17,23 +17,18 @@ import java.util.List;
 public final class Main {
 
     public static void main(String[] args) {
-//        System.out.println("CSC 413 Chess — environment OK.");
-//
-//        Board board = BoardFactory.standard();
-//
-//        System.out.println(new TextBoardRenderer(PieceGlyphs.LETTERS).render(board));
 
         Game game = new Game();
-        TextBoardRenderer renderer = new TextBoardRenderer(PieceGlyphs.LETTERS);
-        System.out.println(renderer.render(game.board()));
 
-        for (String notation : List.of("e2e4", "e7e5")) {
-            game.play(game.findLegalMove(notation).orElseThrow());
+        BoardView view;
+        if (args.length > 0 && args[0].equals("emoji")) {
+            view = new EmojiView();
+        } else {
+            view = new ConsoleView();
         }
-        System.out.println(renderer.render(game.board()));
 
-        game.undoLastMove();
-        System.out.println(renderer.render(game.board()));
+        GameController controller = new GameController(game, view);
+        controller.start();
     }
 
     private Main() {
