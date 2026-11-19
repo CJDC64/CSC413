@@ -30,7 +30,7 @@ import java.util.Set;
 public final class SwingView implements BoardView {
     private static final Color LIGHT = new Color(245, 236, 215);
     private static final Color DARK = new Color(151, 181, 197);
-    private static final Color DESTINATION = new Color(37, 116, 56);
+    private static final Color DESTINATION = new Color(37, 56, 116);
     private final JButton[][] squares = new JButton[8][8];
     private Game game;
     private GameController controller;
