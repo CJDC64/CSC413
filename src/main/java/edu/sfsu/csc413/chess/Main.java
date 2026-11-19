@@ -4,9 +4,10 @@ import edu.sfsu.csc413.chess.view.BoardView;
 import edu.sfsu.csc413.chess.view.ConsoleView;
 import edu.sfsu.csc413.chess.view.EmojiView;
 import edu.sfsu.csc413.chess.view.GameController;
-import edu.sfsu.csc413.chess.view.RotatingTerminalView;
-import edu.sfsu.csc413.chess.view.SwingView;
 import edu.sfsu.csc413.chess.engine.Game;
+
+import edu.sfsu.csc413.chess.view.SwingView;
+import edu.sfsu.csc413.chess.view.RotatingTerminalView;
 
 /**
  * Entry point.
