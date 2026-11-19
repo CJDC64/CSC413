@@ -1,25 +1,17 @@
 package edu.sfsu.csc413.chess;
 
+import edu.sfsu.csc413.chess.engine.Game;
 import edu.sfsu.csc413.chess.view.BoardView;
 import edu.sfsu.csc413.chess.view.ConsoleView;
 import edu.sfsu.csc413.chess.view.EmojiView;
 import edu.sfsu.csc413.chess.view.GameController;
 import edu.sfsu.csc413.chess.view.RotatingTerminalView;
 import edu.sfsu.csc413.chess.view.SwingView;
-import edu.sfsu.csc413.chess.engine.Game;
 
-/**
- * Entry point.
- *
- * <p>At M0 this does nothing but prove the toolchain works. It grows into the
- * real launcher as the engine appears underneath it.
- */
+/** Application entry point. */
 public final class Main {
-
     public static void main(String[] args) {
-
         Game game = new Game();
-
         BoardView view;
         if (args.length > 0 && args[0].equals("emoji")) {
             view = new EmojiView();
@@ -30,11 +22,8 @@ public final class Main {
         } else {
             view = new ConsoleView();
         }
-
-        GameController controller = new GameController(game, view);
-        controller.start();
+        new GameController(game, view).start();
     }
 
-    private Main() {
-    }
+    private Main() { }
 }
