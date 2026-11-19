@@ -4,6 +4,7 @@ import edu.sfsu.csc413.chess.engine.Game;
 import edu.sfsu.csc413.chess.model.Piece;
 import edu.sfsu.csc413.chess.model.PieceType;
 import edu.sfsu.csc413.chess.model.Position;
+import edu.sfsu.csc413.chess.model.Move; // ADDED
 
 import javax.swing.BorderFactory;
 import javax.swing.JButton;
@@ -25,6 +26,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.List; // ADDED
 
 /** An event-driven view; all view state and components belong to the EDT. */
 public final class SwingView implements BoardView {
@@ -39,6 +41,7 @@ public final class SwingView implements BoardView {
     private JFrame frame;
     private JLabel status;
     private JTextArea messages;
+    private JTextArea moveHistory;
     private JButton undo;
     private JButton closeButton;
     private boolean finished;
@@ -138,8 +141,23 @@ public final class SwingView implements BoardView {
                 + "B bishop, Q queen, K king", SwingConstants.CENTER), BorderLayout.NORTH);
         footer.add(new JScrollPane(messages), BorderLayout.CENTER);
         footer.add(buttons, BorderLayout.SOUTH);
+        // ADDED: Create scrollable move history
+        moveHistory = new JTextArea();
+        moveHistory.setEditable(false);
+        moveHistory.setFont(new Font(Font.MONOSPACED, Font.PLAIN, 14));
+        moveHistory.setLineWrap(false);
+
+        JScrollPane historyScroll = new JScrollPane(moveHistory);
+        historyScroll.setBorder(
+                BorderFactory.createTitledBorder("Move History"));
+        historyScroll.setPreferredSize(new Dimension(220, 620));
+
+        // ADDED: Put the board and history next to each other
+        JPanel playArea = new JPanel(new BorderLayout(8, 0));
+        playArea.add(board, BorderLayout.CENTER);
+        playArea.add(historyScroll, BorderLayout.EAST);
         frame.add(status, BorderLayout.NORTH);
-        frame.add(board, BorderLayout.CENTER);
+        frame.add(playArea, BorderLayout.CENTER);
         frame.add(footer, BorderLayout.SOUTH);
         refresh();
         frame.pack();
@@ -188,8 +206,46 @@ public final class SwingView implements BoardView {
                 // Keep normal piece contrast on the final board; the handler blocks play.
             }
         }
+        // ADDED: Refresh move history whenever the board refreshes
+        refreshMoveHistory();
         undo.setEnabled(!finished);
         closeButton.setText(finished ? "Close" : "Quit");
+    }
+
+    // ADDED: Displays moves from the game's actual history
+    private void refreshMoveHistory() {
+        if (moveHistory == null || game == null) {
+            return;
+        }
+
+        List<Move> playedMoves = game.history();
+
+        StringBuilder text = new StringBuilder();
+
+        // Group White and Black moves by turn number
+        for (int i = 0; i < playedMoves.size(); i += 2) {
+            int moveNumber = (i / 2) + 1;
+
+            text.append(String.format("%3d. ", moveNumber));
+            text.append(playedMoves.get(i));
+
+            if (i + 1 < playedMoves.size()) {
+                text.append("    ");
+                text.append(playedMoves.get(i + 1));
+            }
+
+            text.append('\n');
+        }
+
+        if (playedMoves.isEmpty()) {
+            text.append("No moves yet.");
+        }
+
+        moveHistory.setText(text.toString());
+
+        // Automatically scroll to the latest move
+        moveHistory.setCaretPosition(
+                moveHistory.getDocument().getLength());
     }
 
     private void clickSquare(Position position) {
